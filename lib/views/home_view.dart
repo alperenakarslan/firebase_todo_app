@@ -1,9 +1,22 @@
 import 'package:firebase_todo_app/core/extansions/ui/ui_extansion.dart';
+import 'package:firebase_todo_app/model/todo_model.dart';
+import 'package:firebase_todo_app/provider/firebase_auth_provider.dart';
+import 'package:firebase_todo_app/provider/firebase_storage_provider.dart';
+import 'package:firebase_todo_app/views/add_model_sheet.dart';
+import 'package:firebase_todo_app/views/login_view.dart';
+import 'package:firebase_todo_app/views/splash_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:grock/grock_exports.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,35 +34,104 @@ class HomeView extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            CircleAvatar(
-              backgroundImage: const AssetImage("asset/images/logo.png"),
-              radius: context.val7x,
+            IconButton(
+              onPressed: () {
+                ref.read(signOutProvider).then((value) {
+                  // ignore: unused_result
+                  ref.refresh(currentUserProvider);
+                  Grock.toRemove(
+                    const LoginView(),
+                  );
+                });
+              },
+              icon: Icon(
+                Icons.logout_outlined,
+                size: context.val8x,
+              ),
             ),
           ],
         ),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(context.val24x),
-          child: Padding(
-            padding: context.paddingHorizontal6x,
-            child: Column(
-              children: [
-                context.emptySizedHeightBox2x,
-                TextField(
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.search),
-                    labelText: "Search",
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Colors.black,
+      ),
+      body: ref.watch(getTodoProvider).when(
+            data: (value) {
+              final data =
+                  value.map((e) => TodoModel.fromMap(e.data())).toList();
+              return RefreshIndicator.adaptive(
+                onRefresh: () {
+                  return Future.value(
+                    ref.refresh(getTodoProvider),
+                  );
+                },
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: context.val4x),
+                  itemCount: data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final item = data.elementAt(index);
+                    return Opacity(
+                      opacity: item.done == true ? 0.5 : 1,
+                      child: Container(
+                        padding: context.padding1x,
+                        height: context.val16x,
+                        color:
+                            index % 2 == 0 ? Colors.grey.shade300 : Colors.white,
+                        width: double.infinity,
+                        child: ListTile(
+                          title: Text(
+                            item.todo ?? "",
+                            style: TextStyle(
+                              fontSize: context.val5x,
+                            ),
+                          ),
+                          trailing: Checkbox(
+                            value: item.done ?? false,
+                            onChanged: (newValue) => ref
+                                .read(
+                                  doneToggleProvider(
+                                    DoneToggleModel(
+                                        id: value.elementAt(index).id,
+                                        done: newValue ?? false),
+                                  ),
+                                )
+                                .then(
+                                  (value) => ref.refresh(getTodoProvider),
+                                ),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(context.val4x),
-                    ),
-                  ),
+                    );
+                  },
                 ),
-                context.emptySizedHeightBox2x,
-              ],
+              );
+            },
+            loading: () => const Center(
+              child: CircularProgressIndicator(),
             ),
+            error: (error, stackTrace) {
+              return Center(
+                child: Icon(
+                  Icons.warning,
+                  color: Colors.red,
+                  size: context.val15x,
+                ),
+              );
+            },
           ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.grey.shade300,
+        onPressed: () {
+          showModalBottomSheet(
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) => Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: const AddModelSheet(),
+            ),
+          );
+        },
+        child: Icon(
+          Icons.add,
+          size: context.val8x,
         ),
       ),
     );
