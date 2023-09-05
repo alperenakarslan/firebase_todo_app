@@ -4,7 +4,6 @@ import 'package:firebase_todo_app/provider/firebase_auth_provider.dart';
 import 'package:firebase_todo_app/provider/firebase_storage_provider.dart';
 import 'package:firebase_todo_app/views/add_model_sheet.dart';
 import 'package:firebase_todo_app/views/login_view.dart';
-import 'package:firebase_todo_app/views/splash_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:grock/grock_exports.dart';
@@ -72,8 +71,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       child: Container(
                         padding: context.padding1x,
                         height: context.val16x,
-                        color:
-                            index % 2 == 0 ? Colors.grey.shade300 : Colors.white,
+                        color: index % 2 == 0
+                            ? Colors.grey.shade300
+                            : Colors.white,
                         width: double.infinity,
                         child: ListTile(
                           title: Text(
@@ -82,7 +82,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                               fontSize: context.val5x,
                             ),
                           ),
-                          trailing: Checkbox(
+                          leading: Checkbox(
                             value: item.done ?? false,
                             onChanged: (newValue) => ref
                                 .read(
@@ -95,6 +95,15 @@ class _HomeViewState extends ConsumerState<HomeView> {
                                 .then(
                                   (value) => ref.refresh(getTodoProvider),
                                 ),
+                          ),
+                          trailing: IconButton(
+                            onPressed: () async {
+                              await value.elementAt(index).reference.delete();
+                            },
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                           ),
                         ),
                       ),
@@ -137,3 +146,5 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 }
+
+// key: Key(value.elementAt(index).id),

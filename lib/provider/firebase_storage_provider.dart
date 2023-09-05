@@ -29,6 +29,13 @@ final doneToggleProvider = Provider.autoDispose.family(
   },
 );
 
+final deleteTodoProvider = Provider.autoDispose.family(
+  (ref, DoneToggleModel doneToggleModel) async {
+    final firestore = FirebaseFirestore.instance;
+    return await firestore.collection("todos").doc(doneToggleModel.id).delete();
+  },
+);
+
 class DoneToggleModel {
   final String id;
   final bool done;
