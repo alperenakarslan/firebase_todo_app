@@ -6,10 +6,11 @@ import 'package:firebase_todo_app/views/add_model_sheet.dart';
 import 'package:firebase_todo_app/views/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:grock/grock_exports.dart';
 
 class HomeView extends ConsumerStatefulWidget {
-  const HomeView({super.key});
+  const HomeView({super.key, GoogleSignInAccount? googleSignInAccount});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeViewState();
@@ -146,5 +147,3 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 }
-
-// key: Key(value.elementAt(index).id),

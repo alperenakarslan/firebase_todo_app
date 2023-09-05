@@ -25,7 +25,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
       emailController.text.trim(),
       passwordController.text.trim(),
     ];
-    print("asdasd");
     ref
         .read(
           loginUserProvider(list),
@@ -113,7 +112,39 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 ),
               ],
             ),
-          )
+          ),
+          Padding(
+            padding: context.paddingHorizontal8x,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+              ),
+              onPressed: () {
+                signInWithGoogle().then(
+                  (value) => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const HomeView(),
+                    ),
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  Image.asset(
+                    "asset/images/google.png",
+                    height: context.val16x,
+                  ),
+                  Text(
+                    "Sign In with Google",
+                    style: TextStyle(
+                      fontSize: context.val4x * 1.2,
+                      color: Colors.black,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
